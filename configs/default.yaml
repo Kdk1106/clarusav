@@ -66,6 +66,25 @@ sandbox:
   memory_limit: "512m"
   pids_limit: 64
   cpu_quota: 100000
+  rules:
+    bulk_modification:
+      enabled: true
+      min_file_writes: 10
+      min_write_rate_per_sec: 2.0
+      severity: "CRITICAL"
+    ransomware_mass_rename:
+      enabled: true
+      min_mass_renames: 5
+      severity: "CRITICAL"
+    suspicious_process_spawn:
+      enabled: true
+      suspicious_processes:
+        - "cmd.exe"
+        - "powershell.exe"
+        - "vssadmin.exe"
+        - "wmic.exe"
+        - "certutil.exe"
+      severity: "HIGH"
 
 paths:
   quarantine_dir: "/tmp/clarusav/quarantine"

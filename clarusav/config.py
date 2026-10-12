@@ -80,12 +80,52 @@ class ModelsConfig(BaseModel):
     )
 
 
+class BulkModificationRuleConfig(BaseModel):
+    enabled: bool = True
+    min_file_writes: int = 10
+    min_write_rate_per_sec: float = 2.0
+    severity: str = "CRITICAL"
+
+
+class RansomwareMassRenameRuleConfig(BaseModel):
+    enabled: bool = True
+    min_mass_renames: int = 5
+    severity: str = "CRITICAL"
+
+
+class SuspiciousProcessSpawnRuleConfig(BaseModel):
+    enabled: bool = True
+    suspicious_processes: list[str] = Field(
+        default_factory=lambda: [
+            "cmd.exe",
+            "powershell.exe",
+            "vssadmin.exe",
+            "wmic.exe",
+            "certutil.exe",
+        ]
+    )
+    severity: str = "HIGH"
+
+
+class SandboxRulesConfig(BaseModel):
+    bulk_modification: BulkModificationRuleConfig = Field(
+        default_factory=BulkModificationRuleConfig
+    )
+    ransomware_mass_rename: RansomwareMassRenameRuleConfig = Field(
+        default_factory=RansomwareMassRenameRuleConfig
+    )
+    suspicious_process_spawn: SuspiciousProcessSpawnRuleConfig = Field(
+        default_factory=SuspiciousProcessSpawnRuleConfig
+    )
+
+
 class SandboxConfig(BaseModel):
     backend: str = "mock"
     timeout_seconds: int = 60
     memory_limit: str = "512m"
     pids_limit: int = 64
     cpu_quota: int = 100000
+    rules: SandboxRulesConfig = Field(default_factory=SandboxRulesConfig)
 
 
 class PathsConfig(BaseModel):
