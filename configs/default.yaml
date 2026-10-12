@@ -1,0 +1,73 @@
+# ClarusAV Default Configuration
+version: "0.1.0"
+
+features:
+  max_file_size_bytes: 104857600  # 100 MB limit for safety
+  timestamp:
+    min_timestamp: 631152000      # 1990-01-01T00:00:00Z
+    future_tolerance_seconds: 86400 # 24 hours drift tolerance
+  suspicious_imports:
+    - "virtualalloc"
+    - "virtualallocex"
+    - "virtualprotect"
+    - "virtualprotectex"
+    - "writeprocessmemory"
+    - "readprocessmemory"
+    - "createremotethread"
+    - "ntcreatethreadex"
+    - "queueuserapc"
+    - "setthreadcontext"
+    - "getthreadcontext"
+    - "resumethread"
+    - "loadlibrarya"
+    - "loadlibraryw"
+    - "loadlibraryexa"
+    - "loadlibraryexw"
+    - "getprocaddress"
+    - "winexec"
+    - "shellexecutea"
+    - "shellexecutew"
+    - "createprocessa"
+    - "createprocessw"
+    - "urldownloadtofilea"
+    - "urldownloadtofilew"
+    - "internetopena"
+    - "internetopenw"
+    - "httpsendrequesta"
+    - "regcreatekeyexa"
+    - "regsetvalueexa"
+    - "setwindowshookexa"
+    - "setwindowshookexw"
+    - "isdebuggerpresent"
+    - "checkremotedebuggerpresent"
+
+gate:
+  tau_high: 0.85
+  tau_low: 0.15
+  recall_floor: 0.98
+
+models:
+  random_seed: 42
+  selected_model: "xgboost"  # "rf" or "xgboost"
+  calibration: "isotonic"    # "platt" (sigmoid) or "isotonic"
+  rf:
+    n_estimators: 100
+    max_depth: 12
+    random_state: 42
+  xgboost:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+    random_state: 42
+
+sandbox:
+  backend: "mock"            # "mock", "wine-container", "windows-stub"
+  timeout_seconds: 60
+  memory_limit: "512m"
+  pids_limit: 64
+  cpu_quota: 100000
+
+paths:
+  quarantine_dir: "/tmp/clarusav/quarantine"
+  audit_log_path: "/tmp/clarusav/audit.log"
+  cache_path: "/tmp/clarusav/cache.json"

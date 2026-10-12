@@ -1,0 +1,34 @@
+services:
+  clarusav-cli:
+    build:
+      context: .
+      dockerfile: cli/Dockerfile
+    image: clarusav-cli:latest
+    volumes:
+      - clarusav_history:/var/log/clarusav
+      - clarusav_quarantine:/var/quarantine/clarusav
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CLARUSAV_CONFIG=/app/configs/default.yaml
+    network_mode: "none"
+
+  clarusav-sandbox:
+    build:
+      context: sandbox
+      dockerfile: Dockerfile
+    image: clarusav-sandbox:latest
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 512m
+    network_mode: "none"
+    read_only: true
+    tmpfs:
+      - /workspace:rw,noexec,nosuid,size=64m
+      - /tmp:rw,noexec,nosuid,size=16m
+
+volumes:
+  clarusav_history:
+  clarusav_quarantine:
