@@ -1,0 +1,53 @@
+{
+  "version": "0.1.0",
+  "seed": 42,
+  "feature_schema_hash": "7f568bff8a6ddc5d6cdeee9cd48c52ff36819fd5fac43f1c3e36af3bee78af14",
+  "models_evaluated": {
+    "rf": {
+      "true_positives": 8,
+      "false_positives": 0,
+      "true_negatives": 12,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "brier_score": 0.0,
+      "roc_auc": 1.0
+    },
+    "xgboost": {
+      "true_positives": 8,
+      "false_positives": 0,
+      "true_negatives": 12,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "brier_score": 0.0012015430256724358,
+      "roc_auc": 1.0
+    }
+  },
+  "selected_model": "xgboost",
+  "calibration_evaluated": {
+    "raw_brier": 0.0012015430256724358,
+    "platt_brier": 0.007061288156678986,
+    "isotonic_brier": 0.0
+  },
+  "selected_calibration": "isotonic",
+  "validation_metrics": {
+    "true_positives": 8,
+    "false_positives": 0,
+    "true_negatives": 12,
+    "false_negatives": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "false_positive_rate": 0.0,
+    "brier_score": 0.0,
+    "roc_auc": 1.0
+  },
+  "training_samples": 60,
+  "validation_samples": 20,
+  "timestamp": 1791796352.7544901
+}

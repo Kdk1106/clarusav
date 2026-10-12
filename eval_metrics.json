@@ -1,0 +1,72 @@
+{
+  "model_version": "0.1.0",
+  "seed": 42,
+  "feature_schema_hash": "7f568bff8a6ddc5d6cdeee9cd48c52ff36819fd5fac43f1c3e36af3bee78af14",
+  "selected_model_type": "xgboost",
+  "calibration_method": "isotonic",
+  "evaluated_samples": 8,
+  "metrics": {
+    "true_positives": 5,
+    "false_positives": 0,
+    "true_negatives": 3,
+    "false_negatives": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "false_positive_rate": 0.0,
+    "brier_score": 0.0,
+    "roc_auc": 1.0
+  },
+  "sample_explanation": {
+    "sample_id": "ember_test_0011",
+    "model_type": "xgboost",
+    "units": "log-odds",
+    "base_value": 0.26499,
+    "output_value": 3.51021,
+    "top_features": [
+      {
+        "name": "file_size",
+        "value": 72000.0,
+        "shap_value": 3.24521,
+        "direction": "increases_risk",
+        "units": "log-odds"
+      },
+      {
+        "name": "section_count",
+        "value": 2.0,
+        "shap_value": 0.0,
+        "direction": "decreases_risk",
+        "units": "log-odds"
+      },
+      {
+        "name": "max_section_entropy",
+        "value": 7.05,
+        "shap_value": 0.0,
+        "direction": "decreases_risk",
+        "units": "log-odds"
+      },
+      {
+        "name": "import_count",
+        "value": 2.0,
+        "shap_value": 0.0,
+        "direction": "decreases_risk",
+        "units": "log-odds"
+      },
+      {
+        "name": "suspicious_import_count",
+        "value": 2.0,
+        "shap_value": 0.0,
+        "direction": "decreases_risk",
+        "units": "log-odds"
+      }
+    ],
+    "all_contributions": {
+      "file_size": 3.24521,
+      "section_count": 0.0,
+      "max_section_entropy": 0.0,
+      "import_count": 0.0,
+      "suspicious_import_count": 0.0,
+      "timestamp_anomaly": 0.0
+    }
+  }
+}
