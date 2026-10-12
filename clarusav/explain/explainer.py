@@ -1,6 +1,6 @@
 """TreeSHAP explainer module for Random Forest and XGBoost classifiers."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 import shap
@@ -29,7 +29,7 @@ class ExplanationResult:
     base_value: float
     output_value: float
     top_features: list[FeatureContribution]
-    all_contributions: dict[str, float]
+    all_contributions: dict[str, float] = field(default_factory=dict)
 
     def summary_dict(self) -> dict:
         """Structured summary suitable for JSON logging and reporting."""

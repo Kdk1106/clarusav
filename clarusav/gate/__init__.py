@@ -8,6 +8,7 @@ from clarusav.gate.engine import (
     ThresholdSearchResult,
     Verdict,
 )
+from clarusav.gate.uncertainty import DualSignalDecision, DualSignalGate
 
 __all__ = [
     "BandPosition",
@@ -16,4 +17,6 @@ __all__ = [
     "EscalationCurvePoint",
     "ThresholdSearchResult",
     "ConfidenceGate",
+    "DualSignalDecision",
+    "DualSignalGate",
 ]

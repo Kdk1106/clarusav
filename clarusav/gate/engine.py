@@ -20,6 +20,9 @@ class Verdict(StrEnum):
     UNRESOLVED = "UNRESOLVED"
 
 
+GateVerdict = Verdict
+
+
 @dataclass
 class GateDecision:
     """Standardized verdict decision emitted by ClarusAV gating pipeline."""
