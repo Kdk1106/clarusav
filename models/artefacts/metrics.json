@@ -47,7 +47,105 @@
     "brier_score": 0.0,
     "roc_auc": 1.0
   },
+  "gate": {
+    "tau_high": 0.51,
+    "tau_low": 0.5,
+    "recall_floor": 0.98,
+    "validation_escalation_rate": 0.0,
+    "validation_static_recall": 1.0,
+    "validation_static_fpr": 0.0,
+    "escalation_curve": [
+      {
+        "recall_floor": 0.8,
+        "tau_low": 0.5,
+        "tau_high": 0.51,
+        "escalation_rate": 0.0,
+        "static_recall": 1.0,
+        "static_fpr": 0.0,
+        "static_benign_count": 12,
+        "static_malicious_count": 8,
+        "escalated_count": 0
+      },
+      {
+        "recall_floor": 0.85,
+        "tau_low": 0.5,
+        "tau_high": 0.51,
+        "escalation_rate": 0.0,
+        "static_recall": 1.0,
+        "static_fpr": 0.0,
+        "static_benign_count": 12,
+        "static_malicious_count": 8,
+        "escalated_count": 0
+      },
+      {
+        "recall_floor": 0.9,
+        "tau_low": 0.5,
+        "tau_high": 0.51,
+        "escalation_rate": 0.0,
+        "static_recall": 1.0,
+        "static_fpr": 0.0,
+        "static_benign_count": 12,
+        "static_malicious_count": 8,
+        "escalated_count": 0
+      },
+      {
+        "recall_floor": 0.92,
+        "tau_low": 0.5,
+        "tau_high": 0.51,
+        "escalation_rate": 0.0,
+        "static_recall": 1.0,
+        "static_fpr": 0.0,
+        "static_benign_count": 12,
+        "static_malicious_count": 8,
+        "escalated_count": 0
+      },
+      {
+        "recall_floor": 0.95,
+        "tau_low": 0.5,
+        "tau_high": 0.51,
+        "escalation_rate": 0.0,
+        "static_recall": 1.0,
+        "static_fpr": 0.0,
+        "static_benign_count": 12,
+        "static_malicious_count": 8,
+        "escalated_count": 0
+      },
+      {
+        "recall_floor": 0.98,
+        "tau_low": 0.5,
+        "tau_high": 0.51,
+        "escalation_rate": 0.0,
+        "static_recall": 1.0,
+        "static_fpr": 0.0,
+        "static_benign_count": 12,
+        "static_malicious_count": 8,
+        "escalated_count": 0
+      },
+      {
+        "recall_floor": 0.99,
+        "tau_low": 0.5,
+        "tau_high": 0.51,
+        "escalation_rate": 0.0,
+        "static_recall": 1.0,
+        "static_fpr": 0.0,
+        "static_benign_count": 12,
+        "static_malicious_count": 8,
+        "escalated_count": 0
+      },
+      {
+        "recall_floor": 1.0,
+        "tau_low": 0.5,
+        "tau_high": 0.51,
+        "escalation_rate": 0.0,
+        "static_recall": 1.0,
+        "static_fpr": 0.0,
+        "static_benign_count": 12,
+        "static_malicious_count": 8,
+        "escalated_count": 0
+      }
+    ]
+  },
   "training_samples": 60,
   "validation_samples": 20,
-  "timestamp": 1791796352.7544901
+  "timestamp": 1791796758.1071491
 }

@@ -29,7 +29,25 @@ class ModelBundle:
     calibration_method: str = "none"
     calibrator: Any | None = None
     metrics: dict[str, Any] = field(default_factory=dict)
+    tau_high: float = 0.85
+    tau_low: float = 0.15
+    recall_floor: float = 0.98
+    escalation_curve: list[dict[str, Any]] = field(default_factory=list)
     train_timestamp: float = 0.0
+
+    def decide(
+        self,
+        score: float,
+        sample_id: str = "sample",
+        shap_explanation: dict[str, Any] | None = None,
+    ) -> Any:
+        """Evaluate a score through the bundle's frozen confidence gate."""
+        from clarusav.gate.engine import ConfidenceGate
+
+        gate = ConfidenceGate(
+            tau_high=self.tau_high, tau_low=self.tau_low, recall_floor=self.recall_floor
+        )
+        return gate.decide(score=score, sample_id=sample_id, shap_explanation=shap_explanation)
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         """Predict calibrated probabilities p(y=1|x) for input feature matrix.

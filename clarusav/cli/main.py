@@ -217,6 +217,22 @@ def train(
     )
     console.print(calib_table)
 
+    gate_data = comparison_report.get("gate", {})
+    if gate_data:
+        gate_table = Table(
+            title="Confidence Gate Threshold Search (Validation Only)",
+            show_header=True,
+            header_style="bold green",
+        )
+        gate_table.add_column("Parameter", style="bold")
+        gate_table.add_column("Value", style="cyan")
+        gate_table.add_row("Tau High (tau_h)", f"{gate_data['tau_high']:.4f}")
+        gate_table.add_row("Tau Low (tau_l)", f"{gate_data['tau_low']:.4f}")
+        gate_table.add_row("Recall Floor", f"{gate_data['recall_floor']:.4f}")
+        gate_table.add_row("Val Escalation Rate", f"{gate_data['validation_escalation_rate']:.4%}")
+        gate_table.add_row("Val Static Recall", f"{gate_data['validation_static_recall']:.4%}")
+        console.print(gate_table)
+
 
 @app.command(name="eval")
 def eval_cmd(
@@ -258,6 +274,19 @@ def eval_cmd(
     probs = bundle.predict_proba(X_eval)
     eval_metrics = compute_metrics(y_eval, probs)
 
+    # Compute frozen confidence gate decisions
+    decisions = [
+        bundle.decide(
+            score=float(p),
+            sample_id=sha_eval[i] if i < len(sha_eval) else f"sample_{i}",
+        )
+        for i, p in enumerate(probs)
+    ]
+    test_mal = sum(1 for d in decisions if d.verdict == "MALICIOUS")
+    test_ben = sum(1 for d in decisions if d.verdict == "BENIGN")
+    test_esc = sum(1 for d in decisions if d.verdict == "ESCALATE")
+    test_esc_rate = test_esc / len(decisions) if decisions else 0.0
+
     # Compute SHAP explanation on the first sample
     explainer = TreeSHAPExplainer(
         model=bundle.model,
@@ -275,6 +304,14 @@ def eval_cmd(
         "calibration_method": bundle.calibration_method,
         "evaluated_samples": len(X_eval),
         "metrics": eval_metrics,
+        "gate_evaluation": {
+            "frozen_tau_high": bundle.tau_high,
+            "frozen_tau_low": bundle.tau_low,
+            "test_malicious_count": test_mal,
+            "test_benign_count": test_ben,
+            "test_escalated_count": test_esc,
+            "test_escalation_rate": round(test_esc_rate, 4),
+        },
         "sample_explanation": explanation.summary_dict(),
     }
 
@@ -299,6 +336,9 @@ def eval_cmd(
     table.add_row("False Positive Rate (FPR)", f"{eval_metrics['false_positive_rate']:.4f}")
     table.add_row("Brier Score", f"{eval_metrics['brier_score']:.4f}")
     table.add_row("ROC AUC", f"{eval_metrics['roc_auc']:.4f}")
+    table.add_row("Frozen Tau High (tau_h)", f"{bundle.tau_high:.4f}")
+    table.add_row("Frozen Tau Low (tau_l)", f"{bundle.tau_low:.4f}")
+    table.add_row("Test Escalation Rate", f"{test_esc_rate:.4%}")
     table.add_row("SHAP Units", explanation.units)
 
     console.print(table)

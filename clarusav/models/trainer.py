@@ -175,6 +175,18 @@ class ModelTrainer:
 
         calibrated_metrics = compute_metrics(y_val, final_prob)
 
+        # 5. Threshold search on validation only: minimize escalation rate subject to recall floor
+        from dataclasses import asdict
+
+        from clarusav.gate.engine import ConfidenceGate
+
+        gate, gate_search = ConfidenceGate.fit_from_validation(
+            y_val=y_val,
+            p_val=final_prob,
+            recall_floor=self.config.gate.recall_floor,
+        )
+        curve_data = [asdict(pt) for pt in gate_search.escalation_curve]
+
         comparison_report = {
             "version": self.config.version,
             "seed": self.seed,
@@ -191,6 +203,15 @@ class ModelTrainer:
             },
             "selected_calibration": chosen_cal_method,
             "validation_metrics": calibrated_metrics,
+            "gate": {
+                "tau_high": gate_search.tau_high,
+                "tau_low": gate_search.tau_low,
+                "recall_floor": gate_search.target_recall_floor,
+                "validation_escalation_rate": gate_search.validation_escalation_rate,
+                "validation_static_recall": gate_search.validation_static_recall,
+                "validation_static_fpr": gate_search.validation_static_fpr,
+                "escalation_curve": curve_data,
+            },
             "training_samples": len(X_train),
             "validation_samples": len(X_val),
             "timestamp": time.time(),
@@ -206,6 +227,10 @@ class ModelTrainer:
             calibration_method=chosen_cal_method,
             calibrator=chosen_calibrator,
             metrics=calibrated_metrics,
+            tau_high=gate_search.tau_high,
+            tau_low=gate_search.tau_low,
+            recall_floor=gate_search.target_recall_floor,
+            escalation_curve=curve_data,
             train_timestamp=time.time(),
         )
 
