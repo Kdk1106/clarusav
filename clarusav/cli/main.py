@@ -16,7 +16,6 @@ from rich.table import Table
 from clarusav import __version__
 from clarusav.bench.suite import BenchmarkSuite
 from clarusav.config import load_config
-from clarusav.explain.claude import ClaudeThreatAdvisor
 from clarusav.explain.counterfactual import CounterfactualExplainer
 from clarusav.explain.explainer import TreeSHAPExplainer
 from clarusav.explain.narrative import NarrativeExplainer
@@ -582,9 +581,6 @@ def scan(
     json_out: Path | None = typer.Option(
         None, "--json-out", help="Path to write structured JSON scan results"
     ),
-    claude: bool = typer.Option(
-        False, "--claude", help="Generate Claude SOC threat advisory and synthesized YARA rule"
-    ),
 ) -> None:
     """Scan PE files with ML confidence gating, SHAP explanations, and ephemeral sandbox escalation."""
     cfg = load_config()
@@ -653,19 +649,6 @@ def scan(
         # 5. Counterfactual Decision Boundary & Remediation Simulation
         if res.get("counterfactual"):
             render_counterfactual_card(res["counterfactual"])
-
-        # 6. Claude SOC Incident Advisory & YARA Synthesis
-        if claude:
-            console.print()
-            advisory = ClaudeThreatAdvisor.generate_advisory(res)
-            console.print(
-                Panel(
-                    advisory,
-                    title="🤖 Claude SOC Incident Advisory & YARA Synthesis",
-                    border_style="bold cyan",
-                    padding=(1, 2),
-                )
-            )
 
     # Optional report exports
     if html and results:
@@ -926,51 +909,7 @@ def bench(
     console.print(f"[bold green]Saved benchmark metrics to:[/bold green] {output}")
 
 
-@app.command(name="ask-claude")
-def ask_claude(
-    target: Path = typer.Argument(..., help="Path to Windows PE binary to analyze with Claude"),
-    question: str = typer.Option(
-        "Provide an executive SOC incident assessment, threat classification, and recommended containment actions.",
-        "--question",
-        "-q",
-        help="Specific threat inquiry or question for Claude",
-    ),
-    model: Path | None = typer.Option(None, "--model", "-m", help="Path to model bundle (.joblib)"),
-) -> None:
-    """Analyze a PE binary and query Claude for threat intelligence, YARA rules, and SOC advisories."""
-    if not target.is_file():
-        console.print(f"[bold red]Error:[/bold red] Target binary not found: {target}")
-        raise typer.Exit(code=1)
-
-    cfg = load_config()
-    bundle_path = model or _get_default_bundle_path()
-    if not bundle_path.is_file():
-        console.print(f"[bold red]Error:[/bold red] Model bundle not found at {bundle_path}")
-        raise typer.Exit(code=1)
-
-    bundle = ModelBundle.load(bundle_path)
-    res = _scan_single_file(target, bundle=bundle, cfg=cfg, deep=False, auto_quarantine=False)
-    console.print(f"[bold cyan]Querying Claude Intelligence for:[/bold cyan] {target.name}...")
-    advisory = ClaudeThreatAdvisor.generate_advisory(res, user_prompt=question)
-    console.print(
-        Panel(
-            advisory,
-            title=f"🤖 Claude SOC Threat Advisory — {target.name}",
-            border_style="bold cyan",
-            padding=(1, 2),
-        )
-    )
-
-
-@app.command(name="mcp")
-def run_mcp_server() -> None:
-    """Start the Model Context Protocol (MCP) stdio server for Claude Desktop / Claude Code integration."""
-    from clarusav.mcp.server import ClarusAVMCPServer
-
-    server = ClarusAVMCPServer()
-    server.run_stdio()
-
-
 if __name__ == "__main__":
     app()
+
 

@@ -405,37 +405,3 @@ cp docs/conference_paper.docx docs/conference_paper.pdf docs/clarusav_cli.png ~/
 2. **Wine Emulation Fidelity**: User-mode Wine emulation does not support Windows kernel drivers (`.sys`) or undocumented kernel APIs.
 3. **Adversarial Perturbations**: Static PE features can be manipulated by adversaries (e.g. padding to manipulate entropy, benign import inflation).
 4. **Empirical Verification Notice**: No performance or quality metrics are claimed without real execution results via `clarusav bench` on verified datasets.
-
----
-
-## Claude AI & Model Context Protocol (MCP) Integration
-
-ClarusAV provides native integrations with Anthropic's Claude:
-
-### 1. Claude SOC Incident Advisory & YARA Rule Synthesis
-Generate executive incident response advisories and tailored YARA rules using Claude 3.5 Sonnet:
-```bash
-# Scan with automatic Claude SOC advisory and YARA synthesis
-.venv/bin/clarusav scan samples/malware_ransom.exe --claude
-
-# Interactive analyst threat inquiry
-.venv/bin/clarusav ask-claude samples/malware_ransom.exe -q "Explain the risk of peak section entropy"
-```
-
-### 2. Model Context Protocol (MCP) Server for Claude Desktop & Claude Code
-ClarusAV implements the JSON-RPC 2.0 MCP standard so Claude can directly invoke antivirus tools:
-```bash
-# Start the MCP stdio server
-.venv/bin/clarusav mcp
-```
-Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
-```json
-{
-  "mcpServers": {
-    "clarusav": {
-      "command": "/Users/devakrishnak/final/.venv/bin/clarusav",
-      "args": ["mcp"]
-    }
-  }
-}
-```
