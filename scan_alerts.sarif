@@ -1,0 +1,130 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "ClarusAV",
+          "semanticVersion": "0.1.0",
+          "informationUri": "https://github.com/clarusav/clarusav",
+          "rules": [
+            {
+              "id": "CLARUS-001",
+              "name": "MaliciousPEBinary",
+              "shortDescription": {
+                "text": "PE binary classified as malicious by ClarusAV ML pipeline."
+              },
+              "fullDescription": {
+                "text": "The Windows PE binary exhibited static and/or behavioral indicators characteristic of malware."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "CLARUS-002",
+              "name": "SuspiciousEscalatedBinary",
+              "shortDescription": {
+                "text": "Binary escalated to sandbox with suspicious behavioral indicators."
+              },
+              "fullDescription": {
+                "text": "Static analysis placed binary in ambiguous confidence band; dynamic behavioral checks detected suspicious activity."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "CLARUS-003",
+              "name": "UnresolvedManualReview",
+              "shortDescription": {
+                "text": "Binary evaluation failed or timed out during analysis."
+              },
+              "fullDescription": {
+                "text": "Sandbox execution failed, timed out, or produced non-actionable telemetry. Binary requires manual analyst review."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "endTimeUtc": "2026-10-12T16:45:17.990768+00:00"
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "CLARUS-002",
+          "level": "error",
+          "message": {
+            "text": "Malicious Windows PE binary detected (Score: 1.000, Stage: sandbox_escalation). Top contributing features: file_size, section_count, max_section_entropy."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "samples/malware_ransom_sample.exe"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "sha256": "8d3f87717d819d637d9fce3ae997f162f055e12de34f91e3e5a6f756967dba32",
+            "score": 1.0,
+            "stage": "sandbox_escalation",
+            "verdict": "MALICIOUS",
+            "topFeatures": [
+              {
+                "name": "file_size",
+                "value": 66024.0,
+                "shap_value": 3.225067138671875,
+                "units": "log-odds",
+                "direction": "increased risk"
+              },
+              {
+                "name": "section_count",
+                "value": 2.0,
+                "shap_value": 0.0,
+                "units": "log-odds",
+                "direction": "reduced risk"
+              },
+              {
+                "name": "max_section_entropy",
+                "value": 7.994190778778638,
+                "shap_value": 0.0,
+                "units": "log-odds",
+                "direction": "reduced risk"
+              },
+              {
+                "name": "import_count",
+                "value": 0.0,
+                "shap_value": 0.0,
+                "units": "log-odds",
+                "direction": "reduced risk"
+              },
+              {
+                "name": "suspicious_import_count",
+                "value": 0.0,
+                "shap_value": 0.0,
+                "units": "log-odds",
+                "direction": "reduced risk"
+              },
+              {
+                "name": "timestamp_anomaly",
+                "value": 0.0,
+                "shap_value": 0.0,
+                "units": "log-odds",
+                "direction": "reduced risk"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

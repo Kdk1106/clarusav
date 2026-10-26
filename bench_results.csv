@@ -1,0 +1,2 @@
+model_type,sample_count,tau_low,tau_high,escalated_count,escalation_rate,tp,fp,tn,fn,precision,recall,f1,fpr,latency_p50_ms,latency_p95_ms,latency_p99_ms
+xgboost,8,0.5,0.51,0,0.0,5,0,3,0,1.0,1.0,1.0,0.0,0.9045,3.6669,4.7938

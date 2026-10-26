@@ -20,8 +20,9 @@ class NarrativeExplainer:
 
             if name == "max_section_entropy":
                 if val >= 6.8:
+                    impact_str = f"; this increased the malicious score by {abs(shap):.3f} {feat.units}." if shap > 0 else "."
                     cards.append(
-                        f"High entropy ({val:.2f} bits) in sections indicates packed code or cryptographic encryption; this {risk_label} by {abs(shap):.3f} {feat.units}."
+                        f"High entropy ({val:.2f} bits) in sections indicates packed code or cryptographic encryption{impact_str}"
                     )
                 elif val <= 4.0:
                     cards.append(
@@ -34,8 +35,9 @@ class NarrativeExplainer:
 
             elif name == "suspicious_import_count":
                 if val > 0:
+                    impact_str = f"; this increased the malicious score." if shap > 0 else "."
                     cards.append(
-                        f"Detected {int(val)} imported function(s) matching high-risk security watchlist (process injection/memory manipulation); this {risk_label}."
+                        f"Detected {int(val)} imported function(s) matching high-risk security watchlist (process injection/memory manipulation){impact_str}"
                     )
                 else:
                     cards.append(

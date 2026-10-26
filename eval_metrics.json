@@ -29,13 +29,13 @@
     "sample_id": "ember_test_0011",
     "model_type": "xgboost",
     "units": "log-odds",
-    "base_value": 0.26499,
-    "output_value": 3.51021,
+    "base_value": 0.37587,
+    "output_value": 3.60094,
     "top_features": [
       {
         "name": "file_size",
         "value": 72000.0,
-        "shap_value": 3.24521,
+        "shap_value": 3.22507,
         "direction": "increases_risk",
         "units": "log-odds"
       },
@@ -69,7 +69,7 @@
       }
     ],
     "all_contributions": {
-      "file_size": 3.24521,
+      "file_size": 3.22507,
       "section_count": 0.0,
       "max_section_entropy": 0.0,
       "import_count": 0.0,

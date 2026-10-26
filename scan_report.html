@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ClarusAV Security Report - Binary</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      margin: 0;
+      padding: 30px;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #334155;
+    }
+    .badge {
+      background: #ef4444;
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+    }
+    .card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #1e293b; }
+    th { color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1 style="margin:0 0 6px 0;">🛡️ ClarusAV Security Report</h1>
+        <div style="color:#94a3b8;font-size:0.9rem;">Target: <code>samples/malware_ransom.exe</code> | SHA-256: <code>8d3f87717d819d637d9fce3ae997f162f055e12de34f91e3e5a6f756967dba32</code></div>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div class="badge">MALICIOUS</div>
+        
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;color:#38bdf8;">Verdict Summary & Confidence Gating</h3>
+      <p><b>Calibrated Score:</b> <span style="font-size:1.15rem;color:#ef4444;font-weight:bold;">1.0000</span> (100%) | <b>Band Position:</b> MALICIOUS_BAND | <b>Deciding Stage:</b> N/A</p>
+      <div style="background:#334155;border-radius:6px;overflow:hidden;height:14px;width:100%;margin-bottom:12px;">
+        <div style="background:#ef4444;width:100%;height:100%;"></div>
+      </div>
+      <p style="margin:0;font-size:0.85rem;color:#94a3b8;"><b>Gate Thresholds:</b> &tau;<sub>low</sub> = 0.15 (Benign) │ &tau;<sub>high</sub> = 0.85 (Malicious)</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;color:#a855f7;">PE Section Entropy Heatmap</h3>
+      
+            <div style="background:rgba(239,68,68,0.15);border:1px solid #ef4444;border-radius:8px;padding:12px;margin-bottom:14px;color:#fca5a5;">
+              <b>🚨 CRITICAL ENTROPY ALERT:</b> Section entropy above 6.8 bits indicates cryptographic encryption (ransomware) or runtime binary packing (UPX, VMProtect).
+            </div>
+            
+      <table>
+        <thead>
+          <tr><th>Section</th><th>Raw Size</th><th>Entropy</th><th>Distribution Bar</th><th>Packing Assessment</th></tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td><code>.text</code></td>
+              <td>32,500 B</td>
+              <td><b>7.994</b> bits</td>
+              <td>
+                <div style="background:#334155;border-radius:6px;overflow:hidden;height:12px;width:140px;">
+                  <div style="background:#ef4444;width:99%;height:100%;"></div>
+                </div>
+              </td>
+              <td><span style="background:#dc2626;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:bold;">🚨 CRITICAL: PACKED / ENCRYPTED</span></td>
+            </tr>
+            
+            <tr>
+              <td><code>.data</code></td>
+              <td>32,500 B</td>
+              <td><b>6.610</b> bits</td>
+              <td>
+                <div style="background:#334155;border-radius:6px;overflow:hidden;height:12px;width:140px;">
+                  <div style="background:#f59e0b;width:82%;height:100%;"></div>
+                </div>
+              </td>
+              <td><span style="background:#d97706;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:bold;">⚠️ ELEVATED: HIGH DENSITY</span></td>
+            </tr>
+            
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;color:#f97316;">🧠 TreeSHAP Feature Attribution & Threat Drivers</h3>
+      <table>
+        <thead>
+          <tr><th>Alert</th><th>Feature</th><th>Observed</th><th>SHAP Impact</th><th>Threat Direction</th></tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td><span style="background:#dc2626;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:bold;">🚨 CRITICAL</span></td>
+              <td><b>file_size</b></td>
+              <td>66024.0</td>
+              <td><code>+3.2251 log-odds</code></td>
+              <td><span style="color:#ef4444;font-weight:bold;">▲ Pushes MALICIOUS</span></td>
+            </tr>
+            
+            <tr>
+              <td><span style="background:#475569;color:#cbd5e1;padding:2px 8px;border-radius:4px;font-size:0.75rem;">— NEUTRAL</span></td>
+              <td><b>section_count</b></td>
+              <td>2.0</td>
+              <td><code>+0.0000 log-odds</code></td>
+              <td><span style="color:#94a3b8;">Neutral</span></td>
+            </tr>
+            
+            <tr>
+              <td><span style="background:#475569;color:#cbd5e1;padding:2px 8px;border-radius:4px;font-size:0.75rem;">— NEUTRAL</span></td>
+              <td><b>max_section_entropy</b></td>
+              <td>7.994190778778638</td>
+              <td><code>+0.0000 log-odds</code></td>
+              <td><span style="color:#94a3b8;">Neutral</span></td>
+            </tr>
+            
+            <tr>
+              <td><span style="background:#475569;color:#cbd5e1;padding:2px 8px;border-radius:4px;font-size:0.75rem;">— NEUTRAL</span></td>
+              <td><b>import_count</b></td>
+              <td>0.0</td>
+              <td><code>+0.0000 log-odds</code></td>
+              <td><span style="color:#94a3b8;">Neutral</span></td>
+            </tr>
+            
+            <tr>
+              <td><span style="background:#475569;color:#cbd5e1;padding:2px 8px;border-radius:4px;font-size:0.75rem;">— NEUTRAL</span></td>
+              <td><b>suspicious_import_count</b></td>
+              <td>0.0</td>
+              <td><code>+0.0000 log-odds</code></td>
+              <td><span style="color:#94a3b8;">Neutral</span></td>
+            </tr>
+            
+            <tr>
+              <td><span style="background:#475569;color:#cbd5e1;padding:2px 8px;border-radius:4px;font-size:0.75rem;">— NEUTRAL</span></td>
+              <td><b>timestamp_anomaly</b></td>
+              <td>0.0</td>
+              <td><code>+0.0000 log-odds</code></td>
+              <td><span style="color:#94a3b8;">Neutral</span></td>
+            </tr>
+            
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;color:#22c55e;">📋 Plain-English Narrative Explanations</h3>
+      <ul style="padding-left:0;margin:0;">
+        <li style="margin-bottom:8px;list-style:none;"><span style="background:#d97706;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:bold;margin-right:8px;">⚠️ WARNING</span> Binary file size of 66,024 bytes contributed raised the score.</li><li style="margin-bottom:8px;list-style:none;"><span style="background:#0284c7;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:bold;margin-right:8px;">ℹ️ INFO</span> Binary contains 2 section headers; this structural property lowered the score.</li><li style="margin-bottom:8px;list-style:none;"><span style="background:#dc2626;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:bold;margin-right:8px;">🚨 CRITICAL</span> High entropy (7.99 bits) in sections indicates packed code or cryptographic encryption.</li><li style="margin-bottom:8px;list-style:none;"><span style="background:#d97706;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:bold;margin-right:8px;">⚠️ WARNING</span> Sparse import table (0 total functions) suggests dynamic API resolution or packing; this reduced suspicion.</li><li style="margin-bottom:8px;list-style:none;"><span style="background:#059669;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:bold;margin-right:8px;">ℹ️ BENIGN</span> Zero high-risk security watchlist APIs detected; this absence reduced suspicion.</li><li style="margin-bottom:8px;list-style:none;"><span style="background:#059669;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:bold;margin-right:8px;">ℹ️ BENIGN</span> Compile timestamp falls within standard historical epoch range; this reduced suspicion.</li><li style="margin-bottom:8px;list-style:none;"><span style="background:#dc2626;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:bold;margin-right:8px;">🚨 CRITICAL</span> Disposable Sandbox Execution: MALICIOUS behavior observed (Triggered 1 behavioral rule alert(s): ransomware_mass_rename (CRITICAL)).</li>
+      </ul>
+    </div>
+
+    
+            <div class="card" style="border-left:4px solid #3b82f6;">
+              <h3 style="margin-top:0;color:#60a5fa;">💡 Counterfactual Decision Boundary Hint</h3>
+              <p>Verdict would move to the uncertain band if 'file_size' were 6602.40 (currently 66024).</p>
+              <small style="color:#94a3b8;"><em>Model decision boundary explanation, not file intent.</em></small>
+            </div>
+            
+  </div>
+</body>
+</html>

@@ -16,6 +16,7 @@ from rich.table import Table
 from clarusav import __version__
 from clarusav.bench.suite import BenchmarkSuite
 from clarusav.config import load_config
+from clarusav.explain.claude import ClaudeThreatAdvisor
 from clarusav.explain.counterfactual import CounterfactualExplainer
 from clarusav.explain.explainer import TreeSHAPExplainer
 from clarusav.explain.narrative import NarrativeExplainer
@@ -35,6 +36,13 @@ from clarusav.report.sarif import generate_sarif_report
 from clarusav.sandbox.backends import get_sandbox_backend
 from clarusav.store.audit import AuditLog
 from clarusav.store.cache import FastPathCache
+from clarusav.ui.scan_view import (
+    render_counterfactual_card,
+    render_entropy_section,
+    render_narrative_cards,
+    render_shap_table,
+    render_verdict_card,
+)
 from clarusav.watch.watcher import DirectoryWatcher
 
 app = typer.Typer(
@@ -66,6 +74,14 @@ def main(
     """ClarusAV CLI entry point."""
     if version:
         console.print(f"[bold cyan]ClarusAV[/bold cyan] version [green]{__version__}[/green]")
+        raise typer.Exit()
+
+    # No sub-command: show banner + drop into interactive shell
+    if ctx is not None and ctx.invoked_subcommand is None:
+        from clarusav.ui.banner import show_banner
+        from clarusav.ui.shell  import run_shell
+        show_banner()
+        run_shell()
         raise typer.Exit()
 
 
@@ -439,7 +455,7 @@ def _scan_single_file(
         model_type=bundle.selected_model_type,
         feature_names=bundle.feature_names,
     )
-    explanation = explainer.explain_instance(feat_vector, sample_id=sha256, top_k=4)
+    explanation = explainer.explain_instance(feat_vector, sample_id=sha256, top_k=6)
     narratives = NarrativeExplainer.generate_narrative_cards(explanation)
     cf_hint = CounterfactualExplainer.generate_counterfactual(bundle, feat_vector, explanation)
 
@@ -513,7 +529,8 @@ def _scan_single_file(
 
         pe = pefile.PE(str(file_path))
         for s in pe.sections:
-            name = s.Name.decode(errors="ignore").strip("\x00")
+            raw_name = s.Name.decode("latin1", errors="ignore").split("\x00", 1)[0].strip()
+            name = raw_name if raw_name else "<unnamed>"
             entropy = float(s.get_entropy())
             sections_info.append(
                 {"name": name, "size": int(s.SizeOfRawData), "entropy": round(entropy, 3)}
@@ -565,6 +582,9 @@ def scan(
     json_out: Path | None = typer.Option(
         None, "--json-out", help="Path to write structured JSON scan results"
     ),
+    claude: bool = typer.Option(
+        False, "--claude", help="Generate Claude SOC threat advisory and synthesized YARA rule"
+    ),
 ) -> None:
     """Scan PE files with ML confidence gating, SHAP explanations, and ephemeral sandbox escalation."""
     cfg = load_config()
@@ -611,54 +631,39 @@ def scan(
         )
         results.append(res)
 
-        # Render Rich CLI Card
-        verdict = res["verdict"]
-        if verdict == "MALICIOUS":
-            v_style = "[bold white on red] MALICIOUS [/bold white on red]"
-            b_style = "red"
-        elif verdict == "BENIGN":
-            v_style = "[bold white on green] BENIGN [/bold white on green]"
-            b_style = "green"
-        else:
-            v_style = "[bold black on yellow] UNRESOLVED - MANUAL REVIEW [/bold black on yellow]"
-            b_style = "yellow"
+        # 1. High-Impact Executive Verdict Alert Card
+        render_verdict_card(res, file_p)
 
-        summary_text = (
-            f"Target: [bold cyan]{file_p.name}[/bold cyan] ({file_p})\n"
-            f"Verdict: {v_style}  |  Score: [bold]{res['score']:.4f}[/bold]  |  "
-            f"Band: [yellow]{res['band_position']}[/yellow]  |  Stage: [cyan]{res['stage']}[/cyan]\n"
-            f"SHA-256: [dim]{res['sha256']}[/dim]\n"
-            f"Quarantined: {'[bold red]YES[/bold red]' if res['quarantined'] else '[dim]NO[/dim]'}"
-        )
-        console.print(
-            Panel(summary_text, title="ClarusAV Inspection Verdict", border_style=b_style)
-        )
+        # 2. Section Entropy Heatmap with Critical Packing Alert
+        if res.get("sections"):
+            render_entropy_section(res["sections"])
 
-        # Render Section Entropy Heatmap if sections exist
-        if res["sections"]:
-            sec_objs = [
-                SectionEntropyInfo(name=s["name"], size=s["size"], entropy=s["entropy"])
-                for s in res["sections"]
-            ]
-            console.print(EntropyHeatmap.render_terminal(sec_objs))
+        # 3. TreeSHAP Feature Attribution Table with Threat Level Alerts
+        if res.get("top_features"):
+            render_shap_table(
+                top_features=res["top_features"],
+                score=res["score"],
+                model_type=bundle.selected_model_type,
+            )
 
-        # Render Narrative Cards
-        if res["narratives"]:
-            n_table = Table(title="Plain-English Narrative Findings", show_header=False, box=None)
-            n_table.add_column("Bullet", style="bold green", width=3)
-            n_table.add_column("Narrative")
-            for n in res["narratives"]:
-                n_table.add_row("*", n)
-            console.print(n_table)
+        # 4. Plain-English Narrative Explanation Cards with Severity Badges
+        if res.get("narratives"):
+            render_narrative_cards(res["narratives"])
 
-        # Render Counterfactual Hint
+        # 5. Counterfactual Decision Boundary & Remediation Simulation
         if res.get("counterfactual"):
-            cf = res["counterfactual"]
+            render_counterfactual_card(res["counterfactual"])
+
+        # 6. Claude SOC Incident Advisory & YARA Synthesis
+        if claude:
+            console.print()
+            advisory = ClaudeThreatAdvisor.generate_advisory(res)
             console.print(
                 Panel(
-                    f"{cf['message']}\n[dim italic]{cf['disclaimer']}[/dim italic]",
-                    title="SHAP Counterfactual Decision Hint",
-                    border_style="blue",
+                    advisory,
+                    title="🤖 Claude SOC Incident Advisory & YARA Synthesis",
+                    border_style="bold cyan",
+                    padding=(1, 2),
                 )
             )
 
@@ -714,46 +719,21 @@ def explain(
     narratives = NarrativeExplainer.generate_narrative_cards(explanation)
     cf_hint = CounterfactualExplainer.generate_counterfactual(bundle, x_vec, explanation)
 
-    table = Table(
-        title=f"TreeSHAP Feature Attribution (Calibrated Probability: {prob:.4f})",
-        show_header=True,
-        header_style="bold cyan",
-    )
-    table.add_column("Feature", style="bold")
-    table.add_column("Value", style="yellow")
-    table.add_column("SHAP Attribution", style="bold")
-    table.add_column("Units", style="dim")
-    table.add_column("Direction")
+    top_features = [
+        {
+            "name": f.feature_name,
+            "value": f.feature_value,
+            "shap_value": f.shap_value,
+            "units": f.units,
+            "direction": "increased risk" if f.shap_value > 0 else "reduced risk",
+        }
+        for f in explanation.top_features
+    ]
 
-    for f in explanation.top_features:
-        shap_style = "red" if f.shap_value > 0 else "green"
-        direction = (
-            "[red]Pushes Malicious[/red]" if f.shap_value > 0 else "[green]Pushes Benign[/green]"
-        )
-        table.add_row(
-            f.feature_name,
-            f"{f.feature_value:.2f}",
-            f"[{shap_style}]{f.shap_value:+.4f}[/{shap_style}]",
-            f.units,
-            direction,
-        )
-    console.print(table)
-
-    n_table = Table(title="Narrative Explanation Cards", show_header=False, box=None)
-    n_table.add_column("Bullet", style="bold green", width=3)
-    n_table.add_column("Narrative")
-    for n in narratives:
-        n_table.add_row("*", n)
-    console.print(n_table)
-
+    render_shap_table(top_features, score=prob, model_type=bundle.selected_model_type)
+    render_narrative_cards(narratives)
     if cf_hint:
-        console.print(
-            Panel(
-                f"{cf_hint.message}\n[dim italic]{cf_hint.disclaimer}[/dim italic]",
-                title="Counterfactual Decision Boundary Hint",
-                border_style="blue",
-            )
-        )
+        render_counterfactual_card(cf_hint.to_dict())
 
 
 @app.command(name="quarantine")
@@ -946,5 +926,51 @@ def bench(
     console.print(f"[bold green]Saved benchmark metrics to:[/bold green] {output}")
 
 
+@app.command(name="ask-claude")
+def ask_claude(
+    target: Path = typer.Argument(..., help="Path to Windows PE binary to analyze with Claude"),
+    question: str = typer.Option(
+        "Provide an executive SOC incident assessment, threat classification, and recommended containment actions.",
+        "--question",
+        "-q",
+        help="Specific threat inquiry or question for Claude",
+    ),
+    model: Path | None = typer.Option(None, "--model", "-m", help="Path to model bundle (.joblib)"),
+) -> None:
+    """Analyze a PE binary and query Claude for threat intelligence, YARA rules, and SOC advisories."""
+    if not target.is_file():
+        console.print(f"[bold red]Error:[/bold red] Target binary not found: {target}")
+        raise typer.Exit(code=1)
+
+    cfg = load_config()
+    bundle_path = model or _get_default_bundle_path()
+    if not bundle_path.is_file():
+        console.print(f"[bold red]Error:[/bold red] Model bundle not found at {bundle_path}")
+        raise typer.Exit(code=1)
+
+    bundle = ModelBundle.load(bundle_path)
+    res = _scan_single_file(target, bundle=bundle, cfg=cfg, deep=False, auto_quarantine=False)
+    console.print(f"[bold cyan]Querying Claude Intelligence for:[/bold cyan] {target.name}...")
+    advisory = ClaudeThreatAdvisor.generate_advisory(res, user_prompt=question)
+    console.print(
+        Panel(
+            advisory,
+            title=f"🤖 Claude SOC Threat Advisory — {target.name}",
+            border_style="bold cyan",
+            padding=(1, 2),
+        )
+    )
+
+
+@app.command(name="mcp")
+def run_mcp_server() -> None:
+    """Start the Model Context Protocol (MCP) stdio server for Claude Desktop / Claude Code integration."""
+    from clarusav.mcp.server import ClarusAVMCPServer
+
+    server = ClarusAVMCPServer()
+    server.run_stdio()
+
+
 if __name__ == "__main__":
     app()
+

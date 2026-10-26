@@ -1,0 +1,73 @@
+[
+  {
+    "file_path": "samples/malware_ransom_sample.exe",
+    "sha256": "8d3f87717d819d637d9fce3ae997f162f055e12de34f91e3e5a6f756967dba32",
+    "score": 1.0,
+    "verdict": "MALICIOUS",
+    "band_position": "MALICIOUS_BAND",
+    "stage": "sandbox_escalation",
+    "top_features": [
+      {
+        "name": "file_size",
+        "value": 66024.0,
+        "shap_value": 3.225067138671875,
+        "units": "log-odds",
+        "direction": "increased risk"
+      },
+      {
+        "name": "section_count",
+        "value": 2.0,
+        "shap_value": 0.0,
+        "units": "log-odds",
+        "direction": "reduced risk"
+      },
+      {
+        "name": "max_section_entropy",
+        "value": 7.994190778778638,
+        "shap_value": 0.0,
+        "units": "log-odds",
+        "direction": "reduced risk"
+      },
+      {
+        "name": "import_count",
+        "value": 0.0,
+        "shap_value": 0.0,
+        "units": "log-odds",
+        "direction": "reduced risk"
+      },
+      {
+        "name": "suspicious_import_count",
+        "value": 0.0,
+        "shap_value": 0.0,
+        "units": "log-odds",
+        "direction": "reduced risk"
+      },
+      {
+        "name": "timestamp_anomaly",
+        "value": 0.0,
+        "shap_value": 0.0,
+        "units": "log-odds",
+        "direction": "reduced risk"
+      }
+    ],
+    "narratives": [
+      "Binary file size of 66,024 bytes contributed raised the score.",
+      "Binary contains 2 section headers; this structural property lowered the score.",
+      "High entropy (7.99 bits) in sections indicates packed code or cryptographic encryption.",
+      "Sparse import table (0 total functions) suggests dynamic API resolution or packing; this reduced suspicion.",
+      "Zero high-risk security watchlist APIs detected; this absence reduced suspicion.",
+      "Compile timestamp falls within standard historical epoch range; this reduced suspicion.",
+      "Disposable Sandbox Execution: MALICIOUS behavior observed (Triggered 1 behavioral rule alert(s): ransomware_mass_rename (CRITICAL))."
+    ],
+    "counterfactual": {
+      "feature_name": "file_size",
+      "original_value": 66024.0,
+      "counterfactual_value": 6602.4,
+      "target_band": "UNCERTAIN_BAND",
+      "message": "Verdict would move to the uncertain band if 'file_size' were 6602.40 (currently 66024).",
+      "disclaimer": "Model decision boundary explanation, not file intent."
+    },
+    "quarantined": true,
+    "sections": []
+  }
+]
